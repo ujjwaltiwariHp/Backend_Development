@@ -10,7 +10,7 @@ const authRoutes = require('./routes/authRoutes');
 
 app.use(express.json());
 app.use('/user', userRoutes);
-app.use('/auth', authRoutes);
+app.use('/user', authRoutes);
 
 
 const startServer = async () => {
