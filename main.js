@@ -3,12 +3,6 @@ const express = require('express');
 const bcrypt = require('bcrypt');
 require('dotenv').config();
 
-const app = express();
-const port = process.env.PORT || 3000;
-
-app.use(express.json());
-
-
 // PostgreSQL pool setup
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
@@ -25,9 +19,14 @@ const connectDB = async () => {
   }
 };
 
-connectDB();
 
-// Registration Route
+// Now connect to Db , then start the server
+connectDB().then(() => {
+const app = express();
+const port = process.env.PORT || 3000;
+app.use(express.json());
+
+//Registration route
 app.post('/user/register', async (req, res) => {
   const { username, password, confirmPassword, email, first_name, last_name } = req.body;
 
@@ -71,3 +70,7 @@ app.post('/user/register', async (req, res) => {
   }
 });
 
+app.listen(port, () => {
+ console.log(`🚀 Server running at http://localhost:${port}`);
+  });
+});
