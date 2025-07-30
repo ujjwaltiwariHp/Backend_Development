@@ -99,6 +99,32 @@ app.get('/users/:id', async (req, res) => {
   }
 });
 
+//Update: Update user by ID
+app.put('/users/:id', async (req, res) => {
+  const { id } = req.params;
+  const { first_name, last_name } = req.body;
+
+  if (!first_name || !last_name) {
+    return res.status(400).json({ error: 'first_name and last_name are required' });
+  }
+
+  try {
+    const updated = await pool.query(
+      'UPDATE users SET first_name = $1, last_name = $2 WHERE id = $3 RETURNING *',
+      [first_name, last_name, id]
+    );
+
+    if (updated.rows.length === 0) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    res.json({ message: 'User updated', user: updated.rows[0] });
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).json({ error: 'Failed to update user' });
+  }
+});
+
 
 app.listen(port, () => {
  console.log(`🚀 Server running at http://localhost:${port}`);
