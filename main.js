@@ -81,6 +81,25 @@ app.get('/users', async (req, res) => {
   }
 });
 
+// Read one: Get user by ID
+app.get('/users/:id', async (req, res) => {
+  const { id } = req.params;
+  try {
+    const user = await pool.query(
+      'SELECT id, username, email, first_name, last_name, created_at FROM users WHERE id = $1',
+      [id]
+    );
+    if (user.rows.length === 0) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+    res.json(user.rows[0]);
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).json({ error: 'Failed to fetch user' });
+  }
+});
+
+
 app.listen(port, () => {
  console.log(`🚀 Server running at http://localhost:${port}`);
   });
