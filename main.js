@@ -6,9 +6,12 @@ const port = process.env.PORT || 3000;
 
 const pool = require('./database/db');
 const userRoutes = require('./routes/userRoutes');
+const authRoutes = require('./routes/authRoutes');
 
 app.use(express.json());
 app.use('/user', userRoutes);
+app.use('/auth', authRoutes);
+
 
 const startServer = async () => {
   try {
