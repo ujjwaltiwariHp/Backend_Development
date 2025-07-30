@@ -26,7 +26,7 @@ const app = express();
 const port = process.env.PORT || 3000;
 app.use(express.json());
 
-//Registration route
+// Create: Registration route
 app.post('/user/register', async (req, res) => {
   const { username, password, confirmPassword, email, first_name, last_name } = req.body;
 
@@ -67,6 +67,17 @@ app.post('/user/register', async (req, res) => {
   } catch (error) {
     console.error('Registration Error:', error.message);
     res.status(500).json({ error: 'Server error' });
+  }
+});
+
+// Read: Get all users
+app.get('/users', async (req, res) => {
+  try {
+    const result = await pool.query('SELECT id, username, email, first_name, last_name, created_at FROM users');
+    res.json(result.rows);
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).json({ error: 'Failed to fetch users' });
   }
 });
 
