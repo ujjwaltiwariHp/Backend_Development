@@ -124,7 +124,22 @@ app.put('/users/:id', async (req, res) => {
     res.status(500).json({ error: 'Failed to update user' });
   }
 });
+// Delete: Delete user by ID
+app.delete('/users/:id', async (req, res) => {
+  const { id } = req.params;
 
+  try {
+    const deleted = await pool.query('DELETE FROM users WHERE id = $1 RETURNING *', [id]);
+    if (deleted.rows.length === 0) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    res.json({ message: 'User deleted', user: deleted.rows[0] });
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).json({ error: 'Failed to delete user' });
+  }
+});
 
 app.listen(port, () => {
  console.log(`🚀 Server running at http://localhost:${port}`);
