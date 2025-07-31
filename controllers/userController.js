@@ -1,3 +1,4 @@
+const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 const pool = require('../database/db');
 
@@ -69,10 +70,15 @@ const loginUser = async (req, res) => {
     if (!isMatch) {
       return res.status(401).json({ error: 'Invalid username or password' });
     }
+        const token = jwt.sign(
+      { id: user.id, username: user.username },
+      process.env.JWT_SECRET,
+      { expiresIn: '1h' }
+    );
 
     res.status(200).json({
       message: 'Login successful',
-      access_token: user.id, 
+      access_token: token, 
     });
 
   } catch (err) {

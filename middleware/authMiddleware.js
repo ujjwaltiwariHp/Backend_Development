@@ -1,15 +1,22 @@
+const jwt = require('jsonwebtoken');
+
 const authMiddleware = (req, res, next) => {
-  const token = req.headers['access_token'];
+  const authHeader = req.headers['authorization']; 
 
-  if (!token) {
-    return res.status(401).json({ error: 'Access token is required' });
+  if (!authHeader) {
+    return res.status(401).json({ error: 'Access token is missing' });
   }
-  if (isNaN(token)) {
-    return res.status(403).json({ error: 'Invalid access token' });
-  }
-  req.userId = token;
 
-  next(); // move to next middleware or controller
+  const token = authHeader.split(' ')[1]; 
+
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET); // Verify JWT
+    req.user = decoded; 
+    next(); 
+  } catch (err) {
+    return res.status(403).json({ error: 'Invalid or expired token' });
+  }
 };
 
 module.exports = authMiddleware;
+
