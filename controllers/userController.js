@@ -75,7 +75,7 @@ const loginUser = async (req, res) => {
       process.env.JWT_SECRET,
       { expiresIn: '1h' }
     );
-    
+
     const expiryDate = new Date(Date.now() + 60 * 60 * 1000); // 1 hour from now
 
     // Save token in DB
@@ -184,4 +184,5 @@ module.exports = {
   getPaginatedUsers,
   updateUser,
   deleteUser,
+  
 };

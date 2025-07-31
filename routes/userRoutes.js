@@ -10,6 +10,8 @@ const {
   deleteUser
 } = require('../controllers/userController');
 
+const { addAddress } = require('../controllers/addressController');
+
 const authMiddleware = require('../middleware/authMiddleware');
 
 // POST /user/register
@@ -32,6 +34,9 @@ router.put('/:id',authMiddleware, updateUser);
 
 // DELETE /user/:id
 router.delete('/:id',authMiddleware, deleteUser);
+
+// POST /user/address
+router.post('/address', authMiddleware, addAddress);
 
 module.exports = router;
 
