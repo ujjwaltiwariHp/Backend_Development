@@ -5,6 +5,7 @@ const {
   loginUser,
   getAllUsers,
   getUserById,
+  getPaginatedUsers,
   updateUser,
   deleteUser
 } = require('../controllers/userController');
@@ -22,6 +23,9 @@ router.get('/',authMiddleware, getAllUsers);
 
 // GET /user/:id
 router.get('/:id',authMiddleware, getUserById);
+
+// GET /user/list(Pagination)
+router.get('/list/:page', authMiddleware, getPaginatedUsers);
 
 // PUT /user/:id
 router.put('/:id',authMiddleware, updateUser);

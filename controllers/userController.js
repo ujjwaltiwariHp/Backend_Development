@@ -109,6 +109,31 @@ const getUserById = async (req, res) => {
   }
 };
 
+// READ - Get Paginated list of users
+const getPaginatedUsers = async (req, res) => {
+  const page = parseInt(req.params.page) || 1;
+  const limit = 10;
+  const offset = (page - 1) * limit;
+
+  try {
+    const result = await pool.query(
+      `SELECT id, username, email, first_name, last_name, created_at
+       FROM users
+       ORDER BY id
+       LIMIT $1 OFFSET $2`,
+      [limit, offset]
+    );
+
+    res.status(200).json({
+      page,
+      users: result.rows,
+    });
+  } catch (err) {
+    console.error('Pagination error:', err.message);
+    res.status(500).json({ error: 'Failed to fetch paginated users' });
+  }
+};
+
 // UPDATE - Update user by ID
 const updateUser = async (req, res) => {
   const { id } = req.params;
@@ -145,6 +170,7 @@ module.exports = {
   loginUser,
   getAllUsers,
   getUserById,
+  getPaginatedUsers,
   updateUser,
   deleteUser,
 };
