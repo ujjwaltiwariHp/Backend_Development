@@ -114,18 +114,21 @@ const getPaginatedUsers = async (req, res) => {
   const page = parseInt(req.params.page) || 1;
   const limit = 10;
   const offset = (page - 1) * limit;
+  const search = req.query.search || '';
 
   try {
     const result = await pool.query(
       `SELECT id, username, email, first_name, last_name, created_at
        FROM users
+       WHERE username ILIKE $1
        ORDER BY id
-       LIMIT $1 OFFSET $2`,
-      [limit, offset]
+       LIMIT $2 OFFSET $3`,
+      [`%${search}%`, Number(limit), Number(offset)]
     );
 
     res.status(200).json({
       page,
+      search,
       users: result.rows,
     });
   } catch (err) {
