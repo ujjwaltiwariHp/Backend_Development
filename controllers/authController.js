@@ -25,11 +25,11 @@ const loginUser = async (req, res) => {
 
     res.status(200).json({
       message: 'Login successful',
-      access_token: user.id, // Temporary token
+      access_token: user.id, 
     });
 
   } catch (err) {
-    console.error('❌ Login error:', err.message);
+    console.error('Login error:', err.message);
     res.status(500).json({ error: 'Server error' });
   }
 };
