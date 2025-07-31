@@ -70,10 +70,18 @@ const loginUser = async (req, res) => {
     if (!isMatch) {
       return res.status(401).json({ error: 'Invalid username or password' });
     }
-        const token = jwt.sign(
+      const token = jwt.sign(
       { id: user.id, username: user.username },
       process.env.JWT_SECRET,
       { expiresIn: '1h' }
+    );
+    
+    const expiryDate = new Date(Date.now() + 60 * 60 * 1000); // 1 hour from now
+
+    // Save token in DB
+    await pool.query(
+      `INSERT INTO access_tokens (user_id, token, expiry) VALUES ($1, $2, $3)`,
+      [user.id, token, expiryDate]
     );
 
     res.status(200).json({
