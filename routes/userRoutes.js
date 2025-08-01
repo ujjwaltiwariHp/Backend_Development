@@ -40,7 +40,7 @@ router.delete('/:id',authMiddleware, deleteUser);
 router.post('/address', authMiddleware, addAddress);
 
 // GET /user/:id/addresses
-router.get('/user/:id/addresses', authMiddleware, getUserWithAddresses);
+router.get('/:id/address', authMiddleware, getUserWithAddresses);
 
 
 module.exports = router;

@@ -191,7 +191,7 @@ const getUserWithAddresses = async (req, res) => {
 
     const addressResult = await pool.query(
       `SELECT id, address, city, state, pin_code, phone_no, created_at
-       FROM addresses
+       FROM address
        WHERE user_id = $1`,
       [userId]
     );
