@@ -25,12 +25,20 @@ const addAddress = async (req, res) => {
   }
 };
 
+
 const deleteAddress = async (req, res) => {
   const userId = req.userId;
-  const { addressIds } = req.body;
+  let { addressIds } = req.body; 
 
   if (!Array.isArray(addressIds) || addressIds.length === 0) {
     return res.status(400).json({ error: 'Provide an array of address IDs to delete' });
+  }
+
+  // Ensure all IDs are integers
+  addressIds = addressIds.map(id => parseInt(id)).filter(id => !isNaN(id));
+
+  if (addressIds.length === 0) {
+    return res.status(400).json({ error: 'No valid address IDs provided' });
   }
 
   try {
@@ -49,12 +57,12 @@ const deleteAddress = async (req, res) => {
       message: 'Address(es) deleted successfully',
       deleted: result.rows,
     });
-  } catch (err) {
-    console.error('Delete address error:', err.message);
-    res.status(500).json({ error: 'Failed to delete address(es)' });
-  }
-};
+} catch (err) {
+  console.error('Delete address error:', err); 
+  res.status(500).json({ error: 'Failed to delete address(es)', details: err.message });
+}
 
+};
 
 
 module.exports = {

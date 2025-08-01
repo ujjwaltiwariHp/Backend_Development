@@ -70,7 +70,8 @@ const loginUser = async (req, res) => {
     if (!isMatch) {
       return res.status(401).json({ error: 'Invalid username or password' });
     }
-      const token = jwt.sign(
+
+    const token = jwt.sign(
       { id: user.id, username: user.username },
       process.env.JWT_SECRET,
       { expiresIn: '1h' }
@@ -84,9 +85,17 @@ const loginUser = async (req, res) => {
       [user.id, token, expiryDate]
     );
 
+    // Store session info
+    req.session.user = {
+      id: user.id,
+      username: user.username,
+      email: user.email
+    };
+
     res.status(200).json({
       message: 'Login successful',
-      access_token: token, 
+      access_token: token,
+      session_user: req.session.user 
     });
 
   } catch (err) {
@@ -94,6 +103,7 @@ const loginUser = async (req, res) => {
     res.status(500).json({ error: 'Server error' });
   }
 };
+
 
 // READ - Get all users
 const getAllUsers = async (req, res) => {
