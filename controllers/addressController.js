@@ -25,4 +25,39 @@ const addAddress = async (req, res) => {
   }
 };
 
-module.exports = { addAddress };
+const deleteAddress = async (req, res) => {
+  const userId = req.userId;
+  const { addressIds } = req.body;
+
+  if (!Array.isArray(addressIds) || addressIds.length === 0) {
+    return res.status(400).json({ error: 'Provide an array of address IDs to delete' });
+  }
+
+  try {
+    const result = await pool.query(
+      `DELETE FROM address
+       WHERE user_id = $1 AND id = ANY($2::int[])
+       RETURNING *`,
+      [userId, addressIds]
+    );
+
+    if (result.rowCount === 0) {
+      return res.status(404).json({ message: 'No matching addresses found for deletion' });
+    }
+
+    res.status(200).json({
+      message: 'Address(es) deleted successfully',
+      deleted: result.rows,
+    });
+  } catch (err) {
+    console.error('Delete address error:', err.message);
+    res.status(500).json({ error: 'Failed to delete address(es)' });
+  }
+};
+
+
+
+module.exports = {
+   addAddress,
+   deleteAddress
+   };

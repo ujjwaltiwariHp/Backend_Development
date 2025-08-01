@@ -11,7 +11,10 @@ const {
   getUserWithAddresses
 } = require('../controllers/userController');
 
-const { addAddress } = require('../controllers/addressController');
+const {
+   addAddress,
+   deleteAddress
+} = require('../controllers/addressController');
 
 const authMiddleware = require('../middleware/authMiddleware');
 
@@ -41,6 +44,9 @@ router.post('/address', authMiddleware, addAddress);
 
 // GET /user/:id/addresses
 router.get('/:id/address', authMiddleware, getUserWithAddresses);
+
+// DELETE /user/:id/addresses
+router.delete('/address', authMiddleware, deleteAddress);
 
 
 module.exports = router;
