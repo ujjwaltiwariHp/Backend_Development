@@ -21,7 +21,7 @@ const authMiddleware = async (req, res, next) => {
       return res.status(403).json({ error: 'Token expired or invalid' });
     }
 
-    req.user = decoded; // now you can use req.user in protected routes
+    req.userId = decoded.id;
     next();
   } catch (err) {
     return res.status(403).json({ error: 'Invalid or expired token' });
