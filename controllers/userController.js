@@ -174,6 +174,40 @@ const deleteUser = async (req, res) => {
   }
 };
 
+const getUserWithAddresses = async (req, res) => {
+  const userId = req.params.id;
+
+  try {
+    const userResult = await pool.query(
+      `SELECT id, username, email, first_name, last_name, created_at
+       FROM users
+       WHERE id = $1`,
+      [userId]
+    );
+
+    if (userResult.rows.length === 0) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    const addressResult = await pool.query(
+      `SELECT id, address, city, state, pin_code, phone_no, created_at
+       FROM addresses
+       WHERE user_id = $1`,
+      [userId]
+    );
+
+    res.json({
+      user: userResult.rows[0],
+      addresses: addressResult.rows
+    });
+
+  } catch (err) {
+    console.error('User/address fetch error:', err.message);
+    res.status(500).json({ error: 'Server error' });
+  }
+};
+
+
 
 
 module.exports = {
@@ -184,5 +218,6 @@ module.exports = {
   getPaginatedUsers,
   updateUser,
   deleteUser,
+  getUserWithAddresses
   
 };
