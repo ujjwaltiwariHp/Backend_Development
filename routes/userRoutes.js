@@ -46,7 +46,7 @@ router.post('/address', authMiddleware, addAddress);
 router.get('/:id/address', authMiddleware, getUserWithAddresses);
 
 // DELETE /user/:id/addresses
-router.delete('/address', authMiddleware, deleteAddress);
+router.delete('/delete/address', authMiddleware, deleteAddress);
 
 module.exports = router;
 

@@ -29,7 +29,7 @@ const addAddress = async (req, res) => {
 const deleteAddress = async (req, res) => {
   const userId = req.userId;
   let { addressIds } = req.body; 
-
+  
   if (!Array.isArray(addressIds) || addressIds.length === 0) {
     return res.status(400).json({ error: 'Provide an array of address IDs to delete' });
   }
