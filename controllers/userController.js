@@ -104,7 +104,6 @@ const loginUser = async (req, res) => {
   }
 };
 
-
 // READ - Get all users
 const getAllUsers = async (req, res) => {
   try {
@@ -184,6 +183,7 @@ const deleteUser = async (req, res) => {
   }
 };
 
+// READ - Get user with addresses
 const getUserWithAddresses = async (req, res) => {
   const userId = req.params.id;
 
@@ -217,7 +217,70 @@ const getUserWithAddresses = async (req, res) => {
   }
 };
 
+// FORGOT PASSWORD
+const forgotPassword = async (req, res) => {
+  const { email } = req.body;
 
+  try {
+    const userRes = await pool.query('SELECT * FROM users WHERE email = $1', [email]);
+    const user = userRes.rows[0];
+    if (!user) return res.status(404).json({ message: 'User not found' });
+
+    const resetToken = jwt.sign({ email: user.email }, process.env.JWT_SECRET, { expiresIn: '10m' });
+    const expiryTime = new Date(Date.now() + 10 * 60 * 1000); // 10 mins from now
+
+    await pool.query(
+      'UPDATE users SET reset_token = $1, reset_token_expiry = $2, reset_token_used = FALSE WHERE email = $3',
+      [resetToken, expiryTime, email]
+    );
+
+    // You can send an email here or just return the token
+    return res.json({ message: 'Password reset token generated', resetToken });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Server error' });
+  }
+};
+
+//RESET PASSWORD
+  const resetPassword = async (req, res) => {
+  const { token } = req.params;
+  const { newPassword } = req.body;
+
+  try {
+    // Verify JWT
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const email = decoded.email;
+
+    // Check token in DB
+    const userRes = await pool.query(
+      'SELECT * FROM users WHERE email = $1 AND reset_token = $2 AND reset_token_used = FALSE',
+      [email, token]
+    );
+    const user = userRes.rows[0];
+    if (!user) return res.status(400).json({ message: 'Invalid or already used token' });
+
+    const now = new Date();
+    if (now > new Date(user.reset_token_expiry)) {
+      return res.status(400).json({ message: 'Token expired' });
+    }
+
+    // Hash and update password
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+    await pool.query(
+      'UPDATE users SET password = $1, reset_token_used = TRUE WHERE email = $2',
+      [hashedPassword, email]
+    );
+
+    return res.json({ message: 'Password successfully reset' });
+  } catch (err) {
+    if (err.name === 'TokenExpiredError') {
+      return res.status(400).json({ message: 'Token expired' });
+    }
+    console.error(err);
+    res.status(500).json({ message: 'Server error' });
+  }
+};
 
 
 module.exports = {
@@ -228,6 +291,8 @@ module.exports = {
   getPaginatedUsers,
   updateUser,
   deleteUser,
-  getUserWithAddresses
+  getUserWithAddresses,
+  forgotPassword,
+  resetPassword
   
 };
