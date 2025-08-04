@@ -3,14 +3,20 @@ require('dotenv').config();
 
 const session = require('express-session');
 const pgSession = require('connect-pg-simple')(session);
+const passport = require('passport');
 
 const app = express();
 const port = process.env.PORT || 3000;
 
 const pool = require('./database/db');
 const cors = require('cors');
+
+//Routes
 const userRoutes = require('./routes/userRoutes');
 const sessionRoutse = require('./routes/sessionRoutes');
+const authRoutes = require('./routes/authRoutes');
+
+require('./middleware/passportConfig');
 
 app.use(cors());
 app.use(express.json());
@@ -28,9 +34,14 @@ app.use(session({
   }
 }));
 
+app.use(passport.initialize());
+app.use(passport.session());
+
+
 
 app.use('/user', userRoutes);
 app.use('/session', sessionRoutse);
+app.use('/auth', authRoutes);
 
 //serve static files
 app.use('/uploads', express.static('uploads'));
