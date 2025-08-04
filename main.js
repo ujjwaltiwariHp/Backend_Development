@@ -32,6 +32,10 @@ app.use(session({
 app.use('/user', userRoutes);
 app.use('/session', sessionRoutse);
 
+//serve static files
+app.use('/uploads', express.static('uploads'));
+
+
 
 const startServer = async () => {
   try {

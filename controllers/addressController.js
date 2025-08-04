@@ -2,7 +2,7 @@ const pool = require('../database/db');
 
 const addAddress = async (req, res) => {
   const { address, city, state, pin_code, phone_no } = req.body;
-  const user_id = req.userId; // set from authMiddleware
+  const user_id = req.user.id; // set from authMiddleware
 
   if (!address || !city || !state || !pin_code || !phone_no) {
     return res.status(400).json({ error: 'All fields are required' });
@@ -27,7 +27,7 @@ const addAddress = async (req, res) => {
 
 
 const deleteAddress = async (req, res) => {
-  const userId = req.userId;
+  const userId = req.user.id;
   let { addressIds } = req.body; 
   
   if (!Array.isArray(addressIds) || addressIds.length === 0) {

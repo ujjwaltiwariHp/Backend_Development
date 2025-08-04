@@ -282,6 +282,25 @@ const forgotPassword = async (req, res) => {
   }
 };
 
+//Upload user profile image
+const uploadProfileImage = async (req, res) => {
+  if (!req.file) {
+    return res.status(400).json({ message: 'No file uploaded' });
+  }
+
+  const userId = req.user.id; 
+  const filePath = req.file.path; 
+
+  try {
+    await pool.query('UPDATE users SET profile_image = $1 WHERE id = $2', [filePath, userId]);
+    res.json({ message: 'Profile image uploaded successfully', path: filePath });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Database error' });
+  }
+};
+
+
 
 module.exports = {
   registerUser,
@@ -293,6 +312,7 @@ module.exports = {
   deleteUser,
   getUserWithAddresses,
   forgotPassword,
-  resetPassword
+  resetPassword,
+  uploadProfileImage
   
 };

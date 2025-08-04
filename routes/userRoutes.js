@@ -12,7 +12,8 @@ const {
   deleteUser,
   getUserWithAddresses,
   forgotPassword,
-  resetPassword
+  resetPassword,
+  uploadProfileImage
 } = require('../controllers/userController');
 
 const {
@@ -21,6 +22,8 @@ const {
 } = require('../controllers/addressController');
 
 const authMiddleware = require('../middleware/authMiddleware');
+const upload = require('../middleware/uploadMiddleware');
+
 
 // POST /user/register
 router.post('/register', registerUser); //public route...no middleware required
@@ -57,6 +60,10 @@ router.post('/forgot-password', forgotPassword);
 
 // POST /user/verify-reset-password
 router.post('/verify-reset-password/:token',resetPassword);
+
+// POST /user/profile-image
+router.post('/profile-image', authMiddleware, upload.single('image'), uploadProfileImage);
+
 
 module.exports = router;
 
