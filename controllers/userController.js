@@ -1,6 +1,8 @@
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 const pool = require('../database/db');
+const sgMail = require('@sendgrid/mail');
+sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
 // CREATE - Register a new user
 const registerUser = async (req, res) => {
@@ -37,6 +39,16 @@ const registerUser = async (req, res) => {
        RETURNING id, username, email, first_name, last_name, created_at`,
       [username, email, hashedPassword, first_name, last_name]
     );
+
+     const msg = {
+      to: email,
+      from: process.env.FROM_EMAIL,
+      subject: 'Welcome to HangingPanda',
+      text: `Hi ${first_name},\n\nThanks for registering with us!\n\n— With regards,\nHangingPanda`,
+      html: `<p>Hi <strong>${first_name}</strong>,</p><p>Thanks for registering with us!</p><p>— With regards,<br>HangingPanda</p>`,
+    };
+
+    await sgMail.send(msg);
 
     res.status(201).json({
       message: 'User registered successfully',
@@ -234,8 +246,23 @@ const forgotPassword = async (req, res) => {
       [resetToken, expiryTime, email]
     );
 
-    // You can send an email here or just return the token
+    const resetLink = `http://localhost:3000/reset-password/${resetToken}`; 
+    const msg = {
+      to: email,
+      from: process.env.FROM_EMAIL,
+      subject: 'Password Reset Request',
+      text: `Hi ${user.first_name},\n\nYou requested a password reset. Click the link below to reset your password:\n\n${resetLink}\n\nThis link expires in 10 minutes.`,
+      html: `
+        <p>Hi <strong>${user.first_name}</strong>,</p>
+        <p>You requested a password reset. Click the button below to reset your password:</p>
+        <a href="${resetLink}" style="padding: 10px 15px; background-color: #007bff; color: white; text-decoration: none; border-radius: 5px;">Reset Password</a>
+        <p>This link will expire in 10 minutes.</p>
+      `
+    };
+
+    await sgMail.send(msg);
     return res.json({ message: 'Password reset token generated', resetToken });
+
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: 'Server error' });
@@ -272,7 +299,14 @@ const forgotPassword = async (req, res) => {
       [hashedPassword, email]
     );
 
-    return res.json({ message: 'Password successfully reset' });
+     await sendEmail({
+       to: user.email,
+       subject: 'Your Password Has Been Reset',
+       text: `Hello ${user.first_name}, your password has been successfully reset.`,
+       html: `<h3>Password Reset Successful</h3><p>Your password was changed successfully.</p>`,
+   });
+     return res.json({ message: 'Password successfully reset' }); 
+     
   } catch (err) {
     if (err.name === 'TokenExpiredError') {
       return res.status(400).json({ message: 'Token expired' });
