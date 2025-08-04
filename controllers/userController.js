@@ -282,7 +282,7 @@ const forgotPassword = async (req, res) => {
   }
 };
 
-//Upload user profile image
+//Upload user profile image from local
 const uploadProfileImage = async (req, res) => {
   if (!req.file) {
     return res.status(400).json({ message: 'No file uploaded' });
@@ -300,6 +300,30 @@ const uploadProfileImage = async (req, res) => {
   }
 };
 
+//Upload user profile image from Cloudinary
+const uploadProfileImageCloud = async (req, res) => {
+  try {
+    if (!req.file || !req.file.path) {
+      return res.status(400).json({ error: 'No file uploaded to Cloudinary' });
+    }
+
+    const userId = req.user.id;
+    const imageUrl = req.file.path; 
+
+    await pool.query(
+      'UPDATE users SET profile_image = $1 WHERE id = $2',
+      [imageUrl, userId]
+    );
+
+    res.status(200).json({
+      message: 'Image uploaded to Cloudinary successfully',
+      cloudinary_url: imageUrl,
+    });
+  } catch (error) {
+    console.error('Upload Error:', error.message);
+    res.status(500).json({ error: 'Upload to Cloudinary failed' });
+  }
+};
 
 
 module.exports = {
@@ -313,6 +337,7 @@ module.exports = {
   getUserWithAddresses,
   forgotPassword,
   resetPassword,
-  uploadProfileImage
+  uploadProfileImage,
+  uploadProfileImageCloud
   
 };

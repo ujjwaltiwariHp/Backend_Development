@@ -23,6 +23,9 @@ const {
 
 const authMiddleware = require('../middleware/authMiddleware');
 const upload = require('../middleware/uploadMiddleware');
+const cloudinaryUploads = require('../middleware/cloudinaryUpload');
+const { uploadProfileImageCloud } = require('../controllers/userController');
+
 
 
 // POST /user/register
@@ -61,8 +64,11 @@ router.post('/forgot-password', forgotPassword);
 // POST /user/verify-reset-password
 router.post('/verify-reset-password/:token',resetPassword);
 
-// POST /user/profile-image
+// POST /user/profile-image/local
 router.post('/profile-image', authMiddleware, upload.single('image'), uploadProfileImage);
+
+//POST /user/profile-image/cloud
+router.post('/profile-image/cloud', authMiddleware, cloudinaryUploads.single('profile'),uploadProfileImageCloud);
 
 
 module.exports = router;
