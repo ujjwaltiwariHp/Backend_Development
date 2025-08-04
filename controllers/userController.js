@@ -4,7 +4,6 @@ const pool = require('../database/db');
 const sgMail = require('@sendgrid/mail');
 sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
-// CREATE - Register a new user
 const registerUser = async (req, res) => {
   const { username, email, password, confirmPassword, first_name, last_name } = req.body;
 
@@ -61,7 +60,6 @@ const registerUser = async (req, res) => {
   }
 };
 
-// Login Controller
 const loginUser = async (req, res) => {
   const { username, password } = req.body;
 
@@ -116,7 +114,6 @@ const loginUser = async (req, res) => {
   }
 };
 
-// READ - Get all users
 const getAllUsers = async (req, res) => {
   try {
     const users = await pool.query('SELECT id, username, email, first_name, last_name, created_at FROM users');
@@ -126,7 +123,6 @@ const getAllUsers = async (req, res) => {
   }
 };
 
-// READ - Get user by ID
 const getUserById = async (req, res) => {
   const { id } = req.params;
   try {
@@ -138,7 +134,6 @@ const getUserById = async (req, res) => {
   }
 };
 
-// READ - Get Paginated list of users
 const getPaginatedUsers = async (req, res) => {
   const page = parseInt(req.params.page) || 1;
   const limit = 10;
@@ -166,7 +161,6 @@ const getPaginatedUsers = async (req, res) => {
   }
 };
 
-// UPDATE - Update user by ID
 const updateUser = async (req, res) => {
   const { id } = req.params;
   const { first_name, last_name } = req.body;
@@ -183,7 +177,6 @@ const updateUser = async (req, res) => {
   }
 };
 
-// DELETE - Delete user by ID
 const deleteUser = async (req, res) => {
   const { id } = req.params;
   try {
@@ -195,7 +188,6 @@ const deleteUser = async (req, res) => {
   }
 };
 
-// READ - Get user with addresses
 const getUserWithAddresses = async (req, res) => {
   const userId = req.params.id;
 
@@ -229,7 +221,6 @@ const getUserWithAddresses = async (req, res) => {
   }
 };
 
-// FORGOT PASSWORD
 const forgotPassword = async (req, res) => {
   const { email } = req.body;
 
@@ -269,7 +260,6 @@ const forgotPassword = async (req, res) => {
   }
 };
 
-//RESET PASSWORD
   const resetPassword = async (req, res) => {
   const { token } = req.params;
   const { newPassword } = req.body;
@@ -316,7 +306,6 @@ const forgotPassword = async (req, res) => {
   }
 };
 
-//Upload user profile image from local
 const uploadProfileImage = async (req, res) => {
   if (!req.file) {
     return res.status(400).json({ message: 'No file uploaded' });
@@ -334,7 +323,6 @@ const uploadProfileImage = async (req, res) => {
   }
 };
 
-//Upload user profile image from Cloudinary
 const uploadProfileImageCloud = async (req, res) => {
   try {
     if (!req.file || !req.file.path) {
@@ -373,5 +361,4 @@ module.exports = {
   resetPassword,
   uploadProfileImage,
   uploadProfileImageCloud
-  
 };

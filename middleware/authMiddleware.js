@@ -8,10 +8,7 @@ const authMiddleware = async (req, res, next) => {
   if (!token) return res.status(401).json({ error: 'Token required' });
 
   try {
-    // Verify JWT
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-
-    // Check if token is in DB and not expired
     const result = await pool.query(
       `SELECT * FROM access_tokens WHERE token = $1 AND expiry > NOW()`,
       [token]

@@ -34,7 +34,6 @@ const deleteAddress = async (req, res) => {
     return res.status(400).json({ error: 'Provide an array of address IDs to delete' });
   }
 
-  // Ensure all IDs are integers
   addressIds = addressIds.map(id => parseInt(id)).filter(id => !isNaN(id));
 
   if (addressIds.length === 0) {

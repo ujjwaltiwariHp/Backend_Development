@@ -11,7 +11,6 @@ const port = process.env.PORT || 3000;
 const pool = require('./database/db');
 const cors = require('cors');
 
-//Routes
 const userRoutes = require('./routes/userRoutes');
 const sessionRoutse = require('./routes/sessionRoutes');
 const authRoutes = require('./routes/authRoutes');
