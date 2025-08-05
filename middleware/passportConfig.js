@@ -28,31 +28,31 @@ passport.use(new LocalStrategy({
 passport.use(new GoogleStrategy({
   clientID: process.env.GOOGLE_CLIENT_ID,
   clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-  callbackURL: '/auth/google/callback',
-}, async (accessToken, refreshToken, profile, done) => {
+  callbackURL: '/auth/google/callback'
+},async (accessToken, refreshToken, profile, done) => {
   try {
     const email = profile.emails[0].value;
-    const result = await pool.query('SELECT * FROM users WHERE email = $1', [email]);
-    let user = result.rows[0];
+    const firstName = profile.name.givenName || '';
+    const lastName = profile.name.familyName || '';
+    const username = email.split('@')[0] + '_' + Math.floor(Math.random() * 10000);
+    const hashedPassword = await bcrypt.hash('password', 10); 
+    const userResult = await pool.query('SELECT * FROM users WHERE email = $1', [email]);
+    let user = userResult.rows[0];
 
     if (!user) {
-      const insertQuery = `
-        INSERT INTO users (first_name, last_name, email)
-        VALUES ($1, $2, $3) RETURNING *`;
-      const values = [
-        profile.name.givenName,
-        profile.name.familyName,
-        email
-      ];
-      const insertResult = await pool.query(insertQuery, values);
-      user = insertResult.rows[0];
+      const insertResult = await pool.query(
+        `INSERT INTO users (email, first_name, last_name, username, password)
+         VALUES ($1, $2, $3, $4, $5) RETURNING *`,
+        [email, firstName, lastName, username, hashedPassword]
+      );user = insertResult.rows[0];
     }
-
     return done(null, user);
-  } catch (err) {
-    return done(err);
+  } 
+  catch (err) {
+  return done(err);
   }
 }));
+
 
 passport.serializeUser((user, done) => {
   done(null, user.id);
