@@ -14,6 +14,7 @@ const cors = require('cors');
 const userRoutes = require('./routes/userRoutes');
 const sessionRoutse = require('./routes/sessionRoutes');
 const authRoutes = require('./routes/authRoutes');
+const weatherRoute = require('./routes/weatherRoutes');
 
 require('./middleware/passportConfig');
 
@@ -41,6 +42,7 @@ app.use(passport.session());
 app.use('/user', userRoutes);
 app.use('/session', sessionRoutse);
 app.use('/auth', authRoutes);
+app.use('/', weatherRoute);
 
 //serve static files
 app.use('/uploads', express.static('uploads'));
