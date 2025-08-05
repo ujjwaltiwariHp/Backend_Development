@@ -44,4 +44,15 @@ router.get('/google/failure', (req, res) => {
   res.status(401).json({ message: 'login failed' });
 });
 
+router.get('/github',
+  passport.authenticate('github', { scope: ['user:email'] })
+);
+
+router.get('/github/callback',
+  passport.authenticate('github', { failureRedirect: '/login' }),
+  (req, res) => {
+    res.send('Logged in successfully!');
+  }
+);
+
 module.exports = router;

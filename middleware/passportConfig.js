@@ -1,6 +1,7 @@
 const passport = require('passport');
 const LocalStrategy = require('passport-local').Strategy;
 const GoogleStrategy = require('passport-google-oauth20').Strategy;
+const GitHubStrategy = require('passport-github2').Strategy;
 const bcrypt = require('bcrypt');
 const pool = require('../database/db');
 
@@ -24,7 +25,6 @@ passport.use(new LocalStrategy({
   }
 }));
 
-// Passport Google strategy
 passport.use(new GoogleStrategy({
   clientID: process.env.GOOGLE_CLIENT_ID,
   clientSecret: process.env.GOOGLE_CLIENT_SECRET,
@@ -50,6 +50,51 @@ passport.use(new GoogleStrategy({
   } 
   catch (err) {
   return done(err);
+  }
+}));
+
+passport.use(new GitHubStrategy({
+  clientID: process.env.GITHUB_CLIENT_ID,
+  clientSecret: process.env.GITHUB_CLIENT_SECRET,
+  callbackURL: "/auth/github/callback",
+  scope: ['user:email'] 
+},
+async (accessToken, refreshToken, profile, done) => {
+  try {
+    console.log('GitHub profile:', profile);
+    const githubUsername = profile.username;
+    const githubEmail = profile.emails && profile.emails[0]?.value
+      ? profile.emails[0].value
+      : `${githubUsername}@github.com`; 
+    const fullName = profile.displayName || 'GitHub User';
+    const [first_name, last_name] = fullName.split(' ');
+
+    const existingUser = await pool.query(
+      'SELECT * FROM users WHERE email = $1',
+      [githubEmail]
+    );
+
+    if (existingUser.rows.length > 0) {
+      return done(null, existingUser.rows[0]);
+    }
+
+    const newUser = await pool.query(`
+      INSERT INTO users (username, email, first_name, last_name)
+      VALUES ($1, $2, $3, $4)
+      RETURNING *;
+    `, [
+      githubUsername,
+      githubEmail,
+      first_name || 'GitHub',
+      last_name || 'User'
+    ]);
+
+    return done(null, newUser.rows[0]);
+    
+
+  } catch (err) {
+    console.error('GitHub strategy error:', err.message);
+    return done(err, null);
   }
 }));
 
