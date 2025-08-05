@@ -16,6 +16,7 @@ const sessionRoutse = require('./routes/sessionRoutes');
 const authRoutes = require('./routes/authRoutes');
 const weatherRoute = require('./routes/weatherRoutes');
 const postRoutes = require('./routes/postRoutes');
+const navRoutes = require('./routes/navRoutes');
 
 require('./middleware/passportConfig');
 
@@ -45,6 +46,7 @@ app.use('/session', sessionRoutse);
 app.use('/auth', authRoutes);
 app.use('/', weatherRoute);
 app.use('/post', postRoutes);
+app.use('/', navRoutes);
 
 //serve static files
 app.use('/uploads', express.static('uploads'));
