@@ -18,6 +18,8 @@ const weatherRoute = require('./routes/weatherRoutes');
 const postRoutes = require('./routes/postRoutes');
 const navRoutes = require('./routes/navRoutes');
 const instagramRoutes = require('./routes/instagramRoutes');
+const flipkartRoutes = require('./routes/flipkartRoutes');
+
 
 require('./middleware/passportConfig');
 
@@ -49,6 +51,7 @@ app.use('/', weatherRoute);
 app.use('/post', postRoutes);
 app.use('/', navRoutes);
 app.use('/', instagramRoutes);
+app.use('/', flipkartRoutes);
 
 //serve static files
 app.use('/uploads', express.static('uploads'));
