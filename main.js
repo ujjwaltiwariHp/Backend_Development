@@ -1,0 +1,77 @@
+const express = require('express');
+require('dotenv').config();
+
+const session = require('express-session');
+const pgSession = require('connect-pg-simple')(session);
+const passport = require('passport');
+const swaggerUi = require('swagger-ui-express');
+const swaggerSpec = require('./config/swaggerConfig');
+
+const app = express();
+const port = process.env.PORT || 3000;
+
+const pool = require('./database/db');
+const cors = require('cors');
+
+const userRoutes = require('./routes/userRoutes');
+const sessionRoutse = require('./routes/sessionRoutes');
+const authRoutes = require('./routes/authRoutes');
+const weatherRoute = require('./routes/weatherRoutes');
+const postRoutes = require('./routes/postRoutes');
+const navRoutes = require('./routes/navRoutes');
+const instagramRoutes = require('./routes/instagramRoutes');
+const flipkartRoutes = require('./routes/flipkartRoutes');
+
+
+require('./middleware/passportConfig');
+
+app.use(cors());
+app.use(express.json());
+
+app.use(session({
+  store: new pgSession({
+    pool: pool,           
+    tableName: 'session'   
+  }),
+  secret: process.env.SESSION_SECRET ,
+  resave: false,
+  saveUninitialized: false,
+  cookie: {
+    maxAge: 60 * 60 * 1000 // 1 hour
+  }
+}));
+
+app.use(passport.initialize());
+app.use(passport.session());
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+
+
+
+app.use('/user', userRoutes);
+app.use('/session', sessionRoutse);
+app.use('/auth', authRoutes);
+app.use('/', weatherRoute);
+app.use('/post', postRoutes);
+app.use('/', navRoutes);
+app.use('/instagram', instagramRoutes);
+app.use('/', flipkartRoutes);
+
+//serve static files
+app.use('/uploads', express.static('uploads'));
+
+
+
+const startServer = async () => {
+  try {
+    const res = await pool.query('SELECT NOW()');
+    console.log('PostgreSQL connected at:', res.rows[0].now);
+    app.listen(port, () => {
+      console.log(`Server running at http://localhost:${port}`);
+    });
+  } catch (err) {
+    console.error(' DB connection error:', err.message);
+    process.exit(1);
+  }
+};
+
+startServer();

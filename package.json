@@ -1,5 +1,29 @@
 {
+  "scripts": {
+    "start": "nodemon main.js"
+  },
   "dependencies": {
-    "pg": "^8.16.3"
+    "@sendgrid/mail": "^8.1.5",
+    "axios": "^1.11.0",
+    "bcrypt": "^6.0.0",
+    "cheerio": "^1.1.2",
+    "cloudinary": "^1.41.3",
+    "connect-pg-simple": "^10.0.0",
+    "cors": "^2.8.5",
+    "dotenv": "^17.2.1",
+    "express": "^5.1.0",
+    "express-session": "^1.18.2",
+    "jsonwebtoken": "^9.0.2",
+    "multer": "^2.0.2",
+    "multer-storage-cloudinary": "^4.0.0",
+    "nodemon": "^3.1.10",
+    "passport": "^0.7.0",
+    "passport-github2": "^0.1.12",
+    "passport-google-oauth20": "^2.0.0",
+    "passport-local": "^1.0.0",
+    "passport-oauth2": "^1.8.0",
+    "pg": "^8.16.3",
+    "swagger-jsdoc": "^6.2.8",
+    "swagger-ui-express": "^5.0.1"
   }
 }
