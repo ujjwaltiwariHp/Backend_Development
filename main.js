@@ -4,6 +4,8 @@ require('dotenv').config();
 const session = require('express-session');
 const pgSession = require('connect-pg-simple')(session);
 const passport = require('passport');
+const swaggerUi = require('swagger-ui-express');
+const swaggerSpec = require('./config/swaggerConfig');
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -41,6 +43,7 @@ app.use(session({
 
 app.use(passport.initialize());
 app.use(passport.session());
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 
 
@@ -50,7 +53,7 @@ app.use('/auth', authRoutes);
 app.use('/', weatherRoute);
 app.use('/post', postRoutes);
 app.use('/', navRoutes);
-app.use('/', instagramRoutes);
+app.use('/instagram', instagramRoutes);
 app.use('/', flipkartRoutes);
 
 //serve static files
